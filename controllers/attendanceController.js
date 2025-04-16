@@ -74,4 +74,43 @@ checkOut = async (req, res) => {
   }
 };
 
-module.exports = { checkOut, checkIn };
+const getTodayAttendance = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const today = moment().startOf("day").toDate();
+
+    const attendance = await Attendance.findOne({
+      user: userId,
+      checkInDate: today,
+    });
+
+    if (!attendance) {
+      return res.status(200).json(null); // Or return default structure
+    }
+
+    res.status(200).json(attendance);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", err });
+  }
+};
+
+const getAttendanceHistory = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const history = await Attendance.find({ user: userId }).sort({
+      checkInDate: -1,
+    });
+
+    res.status(200).json(history);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", err });
+  }
+};
+
+module.exports = {
+  checkOut,
+  checkIn,
+  getTodayAttendance,
+  getAttendanceHistory,
+};
