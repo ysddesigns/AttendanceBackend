@@ -44,9 +44,9 @@ exports.submitApplication = async (req, res) => {
       institution,
       state,
       department,
-      period,
+      periodOfStay: period,
       expectedStartDate: startDate,
-      applicationStatus: "submitted",
+      applicationStatus: "submit",
     });
 
     await application.save();
