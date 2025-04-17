@@ -56,4 +56,18 @@ login = async (req, res) => {
   }
 };
 
-module.exports = { login, register };
+const userInfo = async (req, res) => {
+  try {
+    const userId = req.userId; // Assuming userId is set in the request object (e.g., via middleware)
+
+    // Fetch user details
+    const user = await User.findById(userId).select("-password"); // Exclude password from the response
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+module.exports = { login, register, userInfo };

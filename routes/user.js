@@ -5,7 +5,11 @@ const authMiddleware = require("../middleware/auth");
 const router = express.Router();
 
 router.get("/profile", authMiddleware, (req, res) => {
-  res.json({ message: `This is protected routes`, user: req.user });
+  res.json({
+    message: `This is protected routes`,
+    user: req.user,
+    userId: req.userId,
+  });
 });
 
 module.exports = router;
