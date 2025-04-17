@@ -16,3 +16,5 @@ const { submitApplication } = require("../controllers/applicationController");
 
 // POST /api/application
 router.post("/", protect, submitApplication); // No multer
+
+module.exports = router;
