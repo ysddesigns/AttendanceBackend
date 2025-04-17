@@ -30,7 +30,7 @@ const applicationSchema = new Schema(
       required: true,
     },
     expectedStartDate: {
-      type: Date,
+      type: String,
       required: true,
     },
     applicationStatus: {
@@ -40,7 +40,6 @@ const applicationSchema = new Schema(
     },
     letter: {
       type: String, // URL or path to the uploaded PDF
-      required: true,
     },
   },
   {
