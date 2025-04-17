@@ -15,6 +15,4 @@ const protect = require("../middleware/auth");
 const { submitApplication } = require("../controllers/applicationController");
 
 // POST /api/application
-router.post("/", protect, submitApplication);
-
-module.exports = router;
+router.post("/", protect, submitApplication); // No multer

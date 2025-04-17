@@ -35,19 +35,8 @@ const Application = require("../model/Application");
 
 exports.submitApplication = async (req, res) => {
   try {
-    const {
-      fullname,
-      institution,
-      state,
-      department,
-      period,
-      startDate,
-      letterBase64, // NEW: base64 string of the PDF
-    } = req.body;
-
-    if (!letterBase64) {
-      return res.status(400).json({ message: "Letter (PDF) is required." });
-    }
+    const { fullname, institution, state, department, period, startDate } =
+      req.body;
 
     const application = new Application({
       user: req.user.userId,
@@ -57,7 +46,6 @@ exports.submitApplication = async (req, res) => {
       department,
       period,
       expectedStartDate: startDate,
-      letter: letterBase64, // Save base64 directly or upload and save URL
       applicationStatus: "submitted",
     });
 
