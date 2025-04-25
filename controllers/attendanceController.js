@@ -9,6 +9,8 @@ const AUTO_CHECKOUT_TIME = moment("05:00 PM", "hh:mm A");
 checkIn = async (req, res) => {
   try {
     const userId = req.user.userId;
+    const fullName = req.user.fullname;
+    const role = req.user.role;
     const today = moment().startOf("day").toDate();
 
     // Prevent multiple check-ins in one day
@@ -26,6 +28,8 @@ checkIn = async (req, res) => {
 
     const attendance = new Attendance({
       user: userId,
+      fullName,
+      role,
       checkInTime: now.toDate(),
       isCheckedIn: true,
       alreadyCheckedIn: true,

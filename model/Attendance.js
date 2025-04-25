@@ -8,6 +8,14 @@ const attendanceSchema = new Schema(
       ref: "User",
       required: true,
     },
+    fullName: {
+      type: String,
+      required: true, // Ensure fullName is always provided
+    },
+    role: {
+      type: String,
+      required: true, // Ensure role is always provided
+    },
     checkInTime: Date,
     checkOutTime: Date,
     isCheckedIn: {
