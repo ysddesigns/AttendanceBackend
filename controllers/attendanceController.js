@@ -108,9 +108,38 @@ const getAttendanceHistory = async (req, res) => {
   }
 };
 
+// for admin
+const getTodayAttendanceHistory = async (req, res) => {
+  try {
+    const today = moment().startOf("day").toDate();
+
+    const history = await Attendance.find({ checkInDate: today }).sort({
+      checkInTime: 1, // Sort by check-in time (earliest to latest)
+    });
+
+    res.status(200).json(history);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", err });
+  }
+};
+
+const getAllUserAttendanceHistory = async (req, res) => {
+  try {
+    const history = await Attendance.find().sort({
+      checkInDate: -1, // Sort by check-in date (latest to earliest)
+    });
+
+    res.status(200).json(history);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", err });
+  }
+};
+
 module.exports = {
   checkOut,
   checkIn,
   getTodayAttendance,
   getAttendanceHistory,
+  getTodayAttendanceHistory,
+  getAllUserAttendanceHistory,
 };
