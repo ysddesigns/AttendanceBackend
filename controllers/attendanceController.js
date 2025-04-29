@@ -11,6 +11,13 @@ checkIn = async (req, res) => {
     const userId = req.user.userId;
     const fullName = req.user.fullname;
     const role = req.user.role;
+
+    if (!fullName || !role) {
+      return res
+        .status(400)
+        .json({ message: "Full name and role are required" });
+    }
+
     const today = moment().startOf("day").toDate();
 
     // Prevent multiple check-ins in one day

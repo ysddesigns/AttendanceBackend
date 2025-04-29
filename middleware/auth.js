@@ -14,6 +14,7 @@ const protect = (req, res, next) => {
       userId: decoded.userId,
       fullname: decoded.fullname,
       role: decoded.role,
+      email: decoded.email,
     };
     next();
   } catch (error) {

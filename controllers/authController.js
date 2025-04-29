@@ -24,7 +24,31 @@ register = async (req, res) => {
     });
 
     await newUser.save();
-    res.status(201).json({ message: "User registered successfully ✅" });
+
+    // Create JWT
+    const token = jwt.sign(
+      { userId: newUser._id, role: newUser.role, fullname: newUser.fullname },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // Exclude password in response
+    const userToReturn = {
+      _id: newUser._id,
+      fullname: newUser.fullname,
+      email: newUser.email,
+      role: newUser.role,
+    };
+
+    res
+      .status(201)
+      .json({
+        user: userToReturn,
+        token,
+        message: "User registered successfully ✅",
+      });
+
+    // res.status(201).json({ message: "User registered successfully ✅" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -41,11 +65,13 @@ login = async (req, res) => {
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ message: "Invalid credentials Please Check Again " });
 
     // Create JWT
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.role, fullname: user.fullname },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
