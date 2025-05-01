@@ -146,6 +146,28 @@ const getAllUserAttendanceHistory = async (req, res) => {
   }
 };
 
+const getLastMonthAttendanceHistory = async (req, res) => {
+  try {
+    const startOfLastMonth = moment()
+      .subtract(1, "month")
+      .startOf("month")
+      .toDate();
+    const endOfLastMonth = moment()
+      .subtract(1, "month")
+      .endOf("month")
+      .toDate();
+
+    const history = await Attendance.find({
+      checkInDate: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+    });
+
+    res.status(200).json(history);
+  } catch (err) {
+    console.error("Error fetching last month history:", err);
+    res.status(500).json({ message: "Server error", err });
+  }
+};
+
 module.exports = {
   checkOut,
   checkIn,
@@ -153,4 +175,5 @@ module.exports = {
   getAttendanceHistory,
   getTodayAttendanceHistory,
   getAllUserAttendanceHistory,
+  getLastMonthAttendanceHistory,
 };

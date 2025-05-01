@@ -8,6 +8,7 @@ const {
   getAttendanceHistory,
   getTodayAttendanceHistory,
   getAllUserAttendanceHistory,
+  getLastMonthAttendanceHistory,
 } = require("../controllers/attendanceController");
 
 router.post("/checkin", protect, checkIn);
@@ -19,5 +20,6 @@ router.get("/history", protect, getAttendanceHistory);
 // Admin routes
 router.get("/admin/today-history", getTodayAttendanceHistory);
 router.get("/admin/all-history", getAllUserAttendanceHistory);
+router.get("/admin/last-month-history", getLastMonthAttendanceHistory);
 
 module.exports = router;
