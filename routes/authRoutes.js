@@ -39,6 +39,7 @@ router.get(
   async (req, res) => {
     let redirectUri = null;
     try {
+      console.log("State received:", req.query.state);
       // Parse the state (which contains the redirectUri from your frontend)
       const parsedState = JSON.parse(req.query.state);
       redirectUri = parsedState.redirectUri;
@@ -64,6 +65,9 @@ router.get(
       { expiresIn: "7d" }
     );
 
+    if (!redirectUri) {
+      return res.status(400).send("Redirect URI is missing or invalid.");
+    }
     // If the redirectUri exists, go back to that page with the token
     if (redirectUri) {
       const redirectUrl = `${decodeURIComponent(redirectUri)}?token=${token}`;
@@ -71,7 +75,7 @@ router.get(
     }
 
     // If redirectUri is not present, just send a success message
-    res.send("Login successful. Please return to the app.");
+    res.send(".");
   }
 );
 
