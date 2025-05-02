@@ -11,6 +11,7 @@ const applicationRoutes = require("./routes/applicationRoutes");
 
 const passport = require("./config/passport");
 app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json());
 app.use(cors());

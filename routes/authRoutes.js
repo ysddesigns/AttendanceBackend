@@ -18,69 +18,62 @@ router.post("/login", login);
 router.post("/userInfo", authMiddleware, userInfo);
 router.post("/set-role", setRole);
 
-// STEP 1: User clicks login → we send them to Google with `state` (which includes redirectUri)
-router.get("/google", (req, res, next) => {
-  const redirectUri = req.query.redirect_uri; // frontend passes this
-  const state = JSON.stringify({ redirectUri }); // pack it as JSON
+// Google OAuth
+// router.get(
+//   "/google",
+//   passport.authenticate("google", { scope: ["profile", "email"] })
+// );
 
+router.get("/google", (req, res, next) => {
+  const state = req.query.state; // Pass the state (which includes redirectUri) here
   passport.authenticate("google", {
     scope: ["profile", "email"],
-    session: false,
-    state, // send it through Google OAuth
-    passReqToCallback: true,
-  })(req, res, next);
+    passReqToCallback: true, // This is important to pass the request to your callback
+    state, // Pass the state here
+  })(req, res, next); // This line starts the authentication flow
 });
 
-// STEP 2: After login, Google sends them back here
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false }),
+  passport.authenticate("google", { session: false }), // Proceed with Google auth
   async (req, res) => {
-    // Unpack the redirectUri from the state we sent earlier
-    let redirectUri;
+    let redirectUri = null;
     try {
+      // Parse the state (which contains the redirectUri from your frontend)
       const parsedState = JSON.parse(req.query.state);
       redirectUri = parsedState.redirectUri;
     } catch (error) {
-      console.warn("Invalid state format", error);
+      console.warn("Invalid state format", error); // Fix the typo here
     }
 
+    // Check if the user exists in the database
     let user = await User.findOne({ email: req.user.email });
     if (!user) {
       user = new User({
         fullname: req.user.fullname,
         email: req.user.email,
-        role: "", // No role yet
+        role: "", // Role is empty initially
       });
       await user.save();
     }
 
+    // Generate a JWT token
     const token = jwt.sign(
       { userId: user._id, role: user.role, fullname: user.fullname },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
+    // If the redirectUri exists, go back to that page with the token
     if (redirectUri) {
       const redirectUrl = `${decodeURIComponent(redirectUri)}?token=${token}`;
-      return res.redirect(redirectUrl);
+      return res.redirect(redirectUrl); // Redirect back to the frontend with the token
     }
 
+    // If redirectUri is not present, just send a success message
     res.send("Login successful. Please return to the app.");
   }
 );
-
-// // Google OAuth
-// // router.get(
-// //   "/google",
-// //   passport.authenticate("google", { scope: ["profile", "email"] })
-// // );
-
-// passport.authenticate("google", {
-//   scope: ["profile", "email"],
-//   passReqToCallback: true,
-//   state: (req) => req.query.state, // optional if state is automatically passed
-// });
 
 // router.get(
 //   "/google/callback",
@@ -147,4 +140,4 @@ router.get(
 //   }
 // );
 
-// module.exports = router;
+module.exports = router;
