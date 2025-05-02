@@ -49,15 +49,11 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    // 🔄 Send token to frontend via redirect
     if (redirectUri) {
       const redirectUrl = `${decodeURIComponent(redirectUri)}?token=${token}`;
       return res.redirect(redirectUrl);
     }
-    // fallback
-    res.redirect(
-      `https://startupkanoattendance.onrender.com/api/auth/set-role?token=${token}`
-    );
+    res.send("Login successful. Please return to the app.");
   }
 );
 
