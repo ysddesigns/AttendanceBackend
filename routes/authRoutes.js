@@ -18,12 +18,6 @@ router.post("/login", login);
 router.post("/userInfo", authMiddleware, userInfo);
 router.post("/set-role", setRole);
 
-// Google OAuth
-// router.get(
-//   "/google",
-//   passport.authenticate("google", { scope: ["profile", "email"] })
-// );
-
 router.get("/google", (req, res, next) => {
   const state = req.query.state; // Pass the state (which includes redirectUri) here
   passport.authenticate("google", {
@@ -43,6 +37,7 @@ router.get(
       // Parse the state (which contains the redirectUri from your frontend)
       const parsedState = JSON.parse(req.query.state);
       redirectUri = parsedState.redirectUri;
+      console.log("Parsed redirectUri:", redirectUri);
     } catch (error) {
       console.warn("Invalid state format", error); // Fix the typo here
     }
@@ -69,15 +64,15 @@ router.get(
       return res.status(400).send("Redirect URI is missing or invalid.");
     }
     // If the redirectUri exists, go back to that page with the token
-    if (redirectUri) {
-      const redirectUrl = `${decodeURIComponent(redirectUri)}?token=${token}`;
-      return res.redirect(redirectUrl); // Redirect back to the frontend with the token
-    }
 
-    // If redirectUri is not present, just send a success message
-    res.send(".");
+    // Log the redirect URL
+    const redirectUrl = `${decodeURIComponent(redirectUri)}?token=${token}`;
+    console.log("Redirecting to:", redirectUrl);
+    // Perform the redirection
+    return res.redirect(redirectUrl);
   }
 );
+module.exports = router;
 
 // router.get(
 //   "/google/callback",
@@ -143,5 +138,3 @@ router.get(
 //     res.redirect(`http://localhost:5001/oauth-success?token=${token}`);
 //   }
 // );
-
-module.exports = router;
