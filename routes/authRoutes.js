@@ -27,7 +27,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
   async (req, res) => {
-    const redirectUri = req.body.redirect_uri;
+    const redirectUri = req.query.redirect_uri;
     // Check if the user already exists in the database
     let user = await User.findOne({ email: req.user.email });
 
