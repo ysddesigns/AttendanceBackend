@@ -56,7 +56,7 @@ router.get(
     }
     // fallback
     res.redirect(
-      `https://startupkanoattendance.onrender.com/role-selection?token=${token}`
+      `https://startupkanoattendance.onrender.com/api/auth/set-role?token=${token}`
     );
   }
 );
