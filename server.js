@@ -9,6 +9,9 @@ const authRoutes = require("./routes/authRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 
+const passport = require("./config/passport");
+app.use(passport.initialize());
+
 app.use(express.json());
 app.use(cors());
 app.use("/uploads", express.static("upload"));

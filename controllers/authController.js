@@ -40,13 +40,11 @@ register = async (req, res) => {
       role: newUser.role,
     };
 
-    res
-      .status(201)
-      .json({
-        user: userToReturn,
-        token,
-        message: "User registered successfully ✅",
-      });
+    res.status(201).json({
+      user: userToReturn,
+      token,
+      message: "User registered successfully ✅",
+    });
 
     // res.status(201).json({ message: "User registered successfully ✅" });
   } catch (error) {
@@ -96,4 +94,26 @@ const userInfo = async (req, res) => {
   }
 };
 
-module.exports = { login, register, userInfo };
+const setRole = async (req, res) => {
+  const { role } = req.body;
+  const token = req.headers.authorization.split(" ")[1]; // Extract token
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Set the user's role
+    user.role = role;
+    await user.save();
+
+    res.json({ message: "Role updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating role", error });
+  }
+};
+
+module.exports = { login, register, userInfo, setRole };
