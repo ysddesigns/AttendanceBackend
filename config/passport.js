@@ -10,23 +10,26 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL:
         "https://startupkanoattendance.onrender.com/api/auth/google/callback",
+      passReqToCallback: true,
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       const existingUser = await User.findOne({
         email: profile.emails[0].value,
       });
 
       if (existingUser) return done(null, existingUser);
-
-      const newUser = new User({
-        fullname: profile.displayName,
-        email: profile.emails[0].value,
-        password: "", // OAuth users won’t need password
-        role: "visitor",
-      });
-
-      await newUser.save();
-      done(null, newUser);
+      try {
+        const newUser = new User({
+          fullname: profile.displayName,
+          email: profile.emails[0].value,
+          password: "", // OAuth users won’t need password
+          role: "visitor",
+        });
+        await newUser.save();
+        done(null, newUser);
+      } catch (error) {
+        return done(err, null);
+      }
     }
   )
 );
