@@ -55,7 +55,12 @@ router.get(
 
     // Generate a JWT token
     const token = jwt.sign(
-      { userId: user._id, role: user.role, fullname: user.fullname },
+      {
+        userId: user._id,
+        role: user.role,
+        fullname: user.fullname,
+        email: user.email,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );

@@ -82,7 +82,7 @@ login = async (req, res) => {
 
 const userInfo = async (req, res) => {
   try {
-    const userId = req.userId; // Assuming userId is set in the request object (e.g., via middleware)
+    const userId = req.user.userId; // Assuming userId is set in the request object (e.g., via middleware)
 
     // Fetch user details
     const user = await User.findById(userId).select("-password"); // Exclude password from the response
