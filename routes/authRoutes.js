@@ -15,7 +15,7 @@ const authMiddleware = require("../middleware/auth");
 router.post("/signup", register);
 router.post("/login", login);
 
-router.post("/userInfo", authMiddleware, userInfo);
+router.get("/userInfo", authMiddleware, userInfo);
 router.post("/set-role", setRole);
 
 router.get("/google", (req, res, next) => {
