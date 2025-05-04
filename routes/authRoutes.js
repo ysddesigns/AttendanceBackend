@@ -95,10 +95,13 @@ router.get(
   "/github/callback",
   passport.authenticate("github", { session: false }),
   async (req, res) => {
+    console.log("Raw state received:", req.query.state);
     let redirectUri = null;
     try {
       const parsedState = JSON.parse(req.query.state);
-      redirectUri = parsedState.redirectUri;
+      console.log("Parsed state:", parsedState);
+
+      redirectUri = parsedState?.redirectUri;
       console.log("Redirect URI received:", redirectUri); // Log for debugging
     } catch (err) {
       console.warn("Failed to parse state", err);
