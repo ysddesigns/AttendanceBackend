@@ -54,7 +54,7 @@ router.get(
       user = new User({
         fullname: req.user.fullname,
         email: req.user.email,
-        role: "", // Role is empty initially
+        role: "visitor", // Role is empty initially
       });
       await user.save();
     }
@@ -99,7 +99,7 @@ router.get(
       user = new User({
         fullname: req.user.fullname,
         email: req.user.email,
-        role: "", // Assign later
+        role: "visitor", // Assign later
       });
       await user.save();
     }
