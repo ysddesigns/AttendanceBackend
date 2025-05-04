@@ -99,8 +99,13 @@ router.get(
     try {
       const parsedState = JSON.parse(req.query.state);
       redirectUri = parsedState.redirectUri;
+      console.log("Redirect URI received:", redirectUri); // Log for debugging
     } catch (err) {
       console.warn("Failed to parse state", err);
+    }
+
+    if (!redirectUri) {
+      return res.status(400).send("Missing redirectUri");
     }
 
     const email = req.user.email;
@@ -127,7 +132,6 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    if (!redirectUri) return res.status(400).send("Missing redirectUri");
     const finalRedirect = `${decodeURIComponent(redirectUri)}?token=${token}`;
     return res.redirect(finalRedirect);
   }
