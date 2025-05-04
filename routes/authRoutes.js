@@ -28,15 +28,21 @@ router.get("/google", (req, res, next) => {
 });
 
 // GET /api/auth/github
-router.get(
-  "/github",
-  passport.authenticate("github", { scope: ["user:email"] })
-);
+router.get("/github", (req, res, next) => {
+  const state = JSON.stringify({ redirectUri: req.query.redirectUri || "" });
+
+  passport.authenticate("github", {
+    scope: ["user:email"],
+    state,
+  })(req, res, next); // <-- this is crucial!
+});
 
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }), // Proceed with Google auth
   async (req, res) => {
+    console.log("✅ GitHub callback hit:", req.query);
+
     let redirectUri = null;
     try {
       console.log("State received:", req.query.state);
@@ -89,30 +95,40 @@ router.get(
   "/github/callback",
   passport.authenticate("github", { session: false }),
   async (req, res) => {
-    let redirectUri = req.query.state
-      ? JSON.parse(req.query.state).redirectUri
-      : null;
+    let redirectUri = null;
+    try {
+      const parsedState = JSON.parse(req.query.state);
+      redirectUri = parsedState.redirectUri;
+    } catch (err) {
+      console.warn("Failed to parse state", err);
+    }
 
-    let user = await User.findOne({ email: req.user.email });
+    const email = req.user.email;
+    let user = await User.findOne({ email });
 
     if (!user) {
       user = new User({
         fullname: req.user.fullname,
-        email: req.user.email,
-        role: "visitor", // Assign later
+        email,
+        password: "",
+        role: "visitor",
       });
       await user.save();
     }
 
     const token = jwt.sign(
-      { userId: user._id, role: user.role, fullname: user.fullname },
+      {
+        userId: user._id,
+        role: user.role,
+        fullname: user.fullname,
+        email: user.email,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    const finalRedirect = `${decodeURIComponent(
-      redirectUri || ""
-    )}?token=${token}`;
+    if (!redirectUri) return res.status(400).send("Missing redirectUri");
+    const finalRedirect = `${decodeURIComponent(redirectUri)}?token=${token}`;
     return res.redirect(finalRedirect);
   }
 );
