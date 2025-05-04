@@ -27,6 +27,12 @@ router.get("/google", (req, res, next) => {
   })(req, res, next); // This line starts the authentication flow
 });
 
+// GET /api/auth/github
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] })
+);
+
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }), // Proceed with Google auth
@@ -77,69 +83,38 @@ router.get(
     return res.redirect(redirectUrl);
   }
 );
+
+// Callback handler
+router.get(
+  "/github/callback",
+  passport.authenticate("github", { session: false }),
+  async (req, res) => {
+    let redirectUri = req.query.state
+      ? JSON.parse(req.query.state).redirectUri
+      : null;
+
+    let user = await User.findOne({ email: req.user.email });
+
+    if (!user) {
+      user = new User({
+        fullname: req.user.fullname,
+        email: req.user.email,
+        role: "", // Assign later
+      });
+      await user.save();
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, role: user.role, fullname: user.fullname },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    const finalRedirect = `${decodeURIComponent(
+      redirectUri || ""
+    )}?token=${token}`;
+    return res.redirect(finalRedirect);
+  }
+);
+
 module.exports = router;
-
-// router.get(
-//   "/google/callback",
-//   passport.authenticate("google", { session: false }),
-//   async (req, res) => {
-//     const state = req.query.state;
-
-//     // const redirectUri = req.query.redirect_uri;
-//     let redirectUri = null;
-//     try {
-//       const parsedState = JSON.parse(state);
-//       redirectUri = parsedState.redirectUri;
-//     } catch (error) {
-//       console.warn("Invalid state format", err);
-//     }
-//     // Check if the user already exists in the database
-//     let user = await User.findOne({ email: req.user.email });
-
-//     if (!user) {
-//       // Create new user with no role initially
-//       user = new User({
-//         fullname: req.user.fullname,
-//         email: req.user.email,
-//         role: "", // Role is empty for now
-//       });
-//       await user.save();
-//     }
-
-//     // Generate a JWT token
-//     const token = jwt.sign(
-//       { userId: user._id, role: user.role, fullname: user.fullname },
-//       process.env.JWT_SECRET,
-//       { expiresIn: "7d" }
-//     );
-
-//     if (redirectUri) {
-//       const redirectUrl = `${decodeURIComponent(redirectUri)}?token=${token}`;
-//       return res.redirect(redirectUrl);
-//     }
-//     res.send("Login successful. Please return to the app.");
-//   }
-// );
-
-// // GitHub OAuth
-// router.get(
-//   "/github",
-//   passport.authenticate("github", { scope: ["user:email"] })
-// );
-
-// router.get(
-//   "/github/callback",
-//   passport.authenticate("github", { session: false }),
-//   (req, res) => {
-//     const token = jwt.sign(
-//       {
-//         userId: req.user._id,
-//         role: req.user.role,
-//         fullname: req.user.fullname,
-//       },
-//       process.env.JWT_SECRET,
-//       { expiresIn: "7d" }
-//     );
-//     res.redirect(`http://localhost:5001/oauth-success?token=${token}`);
-//   }
-// );
