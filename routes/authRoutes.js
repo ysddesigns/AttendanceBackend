@@ -95,9 +95,9 @@ router.get(
   "/github/callback",
   passport.authenticate("github", { session: false }),
   async (req, res) => {
-    console.log("Raw state received:", req.query.state);
     let redirectUri = null;
     try {
+      console.log("Raw state received:");
       const decodedState = decodeURIComponent(req.query.state);
 
       console.log("Decoded state:", decodedState);
