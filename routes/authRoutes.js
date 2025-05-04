@@ -98,9 +98,11 @@ router.get(
     console.log("Raw state received:", req.query.state);
     let redirectUri = null;
     try {
-      const parsedState = JSON.parse(req.query.state);
-      console.log("Parsed state:", parsedState);
+      const decodedState = decodeURIComponent(req.query.state);
 
+      console.log("Decoded state:", decodedState);
+
+      const parsedState = JSON.parse(decodedState);
       redirectUri = parsedState?.redirectUri;
       console.log("Redirect URI received:", redirectUri); // Log for debugging
     } catch (err) {
@@ -135,7 +137,7 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    const finalRedirect = `${decodeURIComponent(redirectUri)}?token=${token}`;
+    const finalRedirect = `${redirectUri}?token=${token}`;
     return res.redirect(finalRedirect);
   }
 );
