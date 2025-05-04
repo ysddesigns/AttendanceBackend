@@ -29,12 +29,14 @@ router.get("/google", (req, res, next) => {
 
 // GET /api/auth/github
 router.get("/github", (req, res, next) => {
-  const state = JSON.stringify({ redirectUri: req.query.redirectUri || "" });
+  const state = req.query.state;
+
+  console.log("🌐 Incoming GitHub state:", state);
 
   passport.authenticate("github", {
     scope: ["user:email"],
     state,
-  })(req, res, next); // <-- this is crucial!
+  })(req, res, next);
 });
 
 router.get(
@@ -97,7 +99,9 @@ router.get(
   async (req, res) => {
     let redirectUri = null;
     try {
-      console.log("Raw state received:");
+      console.log("Req.Query", req.query);
+
+      console.log("Raw state received:", req.query.state);
       const decodedState = decodeURIComponent(req.query.state);
 
       console.log("Decoded state:", decodedState);
