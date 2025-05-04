@@ -53,7 +53,7 @@ passport.use(
         fullname: profile.displayName || profile.username,
         email,
         password: "",
-        role: "user",
+        role: "visitor",
       });
 
       await newUser.save();
