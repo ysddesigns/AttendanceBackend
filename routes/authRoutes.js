@@ -16,7 +16,7 @@ router.post("/signup", register);
 router.post("/login", login);
 
 router.get("/userInfo", authMiddleware, userInfo);
-router.post("/set-role", setRole);
+router.post("/set-role", authMiddleware, setRole);
 
 router.get("/google", (req, res, next) => {
   const state = req.query.state; // Pass the state (which includes redirectUri) here

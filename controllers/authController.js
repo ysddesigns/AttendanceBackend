@@ -96,10 +96,8 @@ const userInfo = async (req, res) => {
 
 const setRole = async (req, res) => {
   const { role } = req.body;
-  const token = req.headers.authorization.split(" ")[1]; // Extract token
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId);
 
     if (!user) {
