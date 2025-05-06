@@ -98,18 +98,26 @@ const setRole = async (req, res) => {
   const { role } = req.body;
 
   try {
-    const user = await User.findById(decoded.userId);
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: No user ID found" });
+    }
+
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Set the user's role
     user.role = role;
     await user.save();
 
     res.json({ message: "Role updated successfully" });
   } catch (error) {
+    console.error("❌ Error updating role:", error);
     res.status(500).json({ message: "Error updating role", error });
   }
 };
