@@ -23,7 +23,7 @@ passport.use(
           fullname: profile.displayName,
           email: profile.emails[0].value,
           password: "", // OAuth users won’t need password
-          role: "visitor",
+          role: "user",
         });
         await newUser.save();
         done(null, newUser);
@@ -53,7 +53,7 @@ passport.use(
         fullname: profile.displayName || profile.username,
         email,
         password: "",
-        role: "visitor",
+        role: "user",
       });
 
       await newUser.save();

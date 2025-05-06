@@ -62,7 +62,7 @@ router.get(
       user = new User({
         fullname: req.user.fullname,
         email: req.user.email,
-        role: "visitor", // Role is empty initially
+        role: "user", // Role is empty initially
       });
       await user.save();
     }
@@ -125,7 +125,7 @@ router.get(
         fullname: req.user.fullname,
         email,
         password: "",
-        role: "visitor",
+        role: "user",
       });
       await user.save();
     }
